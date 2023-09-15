@@ -12,6 +12,10 @@ class LogItem(mongoengine.Document):
     timestamp = mongoengine.DateTimeField()
     exception = mongoengine.StringField()
     traceback = mongoengine.StringField()
+    # extra info, optional
+    component = mongoengine.StringField()
+    user = mongoengine.StringField()
+
     meta = {
         'collection': os.getenv('LOG_MONGO_COLLECTION', 'logs')
     }
@@ -24,7 +28,9 @@ def mongo_sink(message):
         timestamp=message.record["time"],
         exception=str(message.record["exception"]),
         traceback=message.record["exception"].__traceback__ if message.record[
-            "exception"] else None
+            "exception"] else None,
+        component=message.record["extra"].get("component", None),
+        user=message.record["extra"].get("user", None),
     )
     log_item.save()
 
