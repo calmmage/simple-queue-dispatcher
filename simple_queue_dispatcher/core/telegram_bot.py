@@ -1,7 +1,7 @@
 import re
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import Optional, List, Dict
+from typing import List, Dict
 
 # from aiogram.types import Message
 # from aiogram.utils.markdown import hbold
@@ -222,7 +222,6 @@ class TelegramBot(BotBase):
         pass
         return None
 
-
     def _extract_message_text(self, message: types.Message) -> str:
         result = ""
         # option 1: message text
@@ -239,11 +238,9 @@ class TelegramBot(BotBase):
         # todo: ... if content_parsing_mode is enabled - parse content text
         return result
 
-
     def _process_voice_message(self, voice_message):
         # extract and parse message with whisper api
         raise NotImplementedError
-
 
     @mark_command(commands=['multistart'],
                   description="Start multi-message mode")
@@ -254,7 +251,6 @@ class TelegramBot(BotBase):
         # todo: initiate timeout and if not deactivated - process messages
         #  automatically
 
-
     @mark_command(commands=['multiend'], description="End multi-message mode")
     async def multi_message_end(self, message: types.Message):
         # deactivate multi-message mode and process content
@@ -263,7 +259,6 @@ class TelegramBot(BotBase):
 
         self.process_messages_stack()
         self.logger.info("Messages processed")  # todo: report results / link
-
 
     def process_messages_stack(self):
         if len(self.messages_stack) == 0:
@@ -287,7 +282,6 @@ class TelegramBot(BotBase):
         self.messages_stack = []
         # return item
 
-
     async def process_message(self, message: types.Message):
         if self._multi_message_mode:
             self.messages_stack.append(message)
@@ -296,7 +290,6 @@ class TelegramBot(BotBase):
             # add item and bulk add
             # automatically start multi-message mode
             await self.add_item(message)
-
 
     def bootstrap(self):
         # todo: simple message parsing
@@ -308,7 +301,6 @@ class TelegramBot(BotBase):
         # todo: /setup command
         # todo: /bulkadd command
 
-
     # ------------------------------------------------------
     # New Commands
     # ------------------------------------------------------
@@ -316,7 +308,6 @@ class TelegramBot(BotBase):
     @mark_command(commands=['addqueue'], description="Add a new queue")
     def add_queue(self, message: types.Message):
         raise NotImplementedError
-
 
     @mark_command(commands=['register'], description="Setup a new queue")
     async def register_queue(self, message: types.Message):
@@ -344,7 +335,6 @@ class TelegramBot(BotBase):
         item = SQDQueueInfoMessage(**data)
         self.app.add_queue(item)
 
-
     @mark_command(commands=['bulkadd'],
                   description="Add multiple items to queue")
     async def bulk_add(self, message: types.Message):
@@ -360,7 +350,6 @@ class TelegramBot(BotBase):
         # todo: request missing data one by one
         raise NotImplementedError
 
-
     @mark_command()
     async def get(self, message: types.Message):
         """
@@ -370,7 +359,6 @@ class TelegramBot(BotBase):
         - if nothing - get latest
         """
         pass
-
 
     @mark_command()
     async def get_item(self, message: types.Message):
