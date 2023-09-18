@@ -14,7 +14,7 @@ class SQDQueueItemMongo(Document):
 class SQDQueueInfoMongo(Document):
     name = StringField(required=True)
     input_chat_id = StringField(required=False)
-    output_chat_id = StringField(required=True)
+    output_chat_id = StringField(required=False)
     archive_chat_id = StringField(required=False)
 
     meta = {'collection': 'sqd_queue_infos'}  # Explicitly set collection name
@@ -22,6 +22,6 @@ class SQDQueueInfoMongo(Document):
 
 if __name__ == '__main__':
     # test mongo connection
-    from simple_queue_dispatcher.data.mongo_utils import connect_to_db
+    from simple_queue_dispatcher.data_model.mongo_utils import connect_to_db
 
     connect_to_db()

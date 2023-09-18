@@ -1,10 +1,10 @@
 import mongomock
 import pytest
+from bot_base.data_model.mongo_utils import (add_item, get_item,
+                                             update_item, delete_item)
 from mongoengine import connect, disconnect
 
-from simple_queue_dispatcher.data.data_model_mongo import SQDQueueItemMongo
-from simple_queue_dispatcher.data.mongo_utils import (add_item, get_item,
-                                                      update_item, delete_item)
+from simple_queue_dispatcher.data_model.dm_mongo import SQDQueueItemMongo
 
 
 @pytest.fixture(scope='function')

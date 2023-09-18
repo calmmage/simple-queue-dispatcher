@@ -1,21 +1,17 @@
 [tool.poetry]
 name = "simple-queue-dispatcher"
-version = "0.1.0"
+version = "0.2.0"
 description = ""
 authors = ["Petr Lavrov <calmmage@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-aiogram = "^3.0.0"
-pydantic = "^2.3.0"
-pydantic-settings = "^2.0.3"
-mongoengine = "^0.27.0"
 pytest = "^7.4.2"
 mongomock = "^4.1.2"
-loguru = "^0.7.2"
 openai = "*"
 black = "^23.9.1"
+bot-base = { git = "https://github.com/calmmage/bot-base.git", branch = "frozen-simple-queue-dispatcher" }
 
 
 [build-system]

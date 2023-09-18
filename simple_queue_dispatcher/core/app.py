@@ -1,36 +1,20 @@
-import asyncio
+from bot_base.core import App
+from bot_base.data_model import mongo_utils
 
-import loguru
-import mongoengine
-from dotenv import load_dotenv
-
-from simple_queue_dispatcher.core.app_config import AppConfig
-from simple_queue_dispatcher.core.telegram_bot import TelegramBot
-from simple_queue_dispatcher.data import mongo_utils
-from simple_queue_dispatcher.data.data_model_mongo import SQDQueueItemMongo, \
+from simple_queue_dispatcher.core.app_config import SQDAppConfig
+from simple_queue_dispatcher.core.telegram_bot import SQDTelegramBot
+from simple_queue_dispatcher.data_model.dm_mongo import SQDQueueItemMongo, \
     SQDQueueInfoMongo
-from simple_queue_dispatcher.data.data_model_pydantic import \
-    SQDQueueItemMessage, SQDQueueInfoMessage, QueueChatType
+from simple_queue_dispatcher.data_model.dm_pydantic import \
+    SQDQueueItemMessage, SQDQueueInfoMessage, QueueChatType, GetQueueResponse
 
 
-class SQDApp:
-    logger = loguru.logger.bind(component="TelegramBot")
+class SQDApp(App):
+    _app_config_class = SQDAppConfig
+    _telegram_bot_class = SQDTelegramBot
 
-    def __init__(self, config: AppConfig = None):
-        if config is None:
-            config = self._load_config()
-        self.config = config
-        self.db = self._connect_db()
-        self.bot = TelegramBot(config.telegram_bot, app=self)
-
-    def _load_config(self):
-        load_dotenv()
-        return AppConfig()
-
-    def _connect_db(self):
-        db_config = self.config.database
-        return mongoengine.connect(db=db_config.name,  # alias = db_config.name
-                                   host=db_config.conn_str)
+    def __init__(self, config: _app_config_class = None):
+        super().__init__(config)
 
     # ------------------------------------------------------
     # API
@@ -71,8 +55,9 @@ class SQDApp:
     # ------------------------------------------------------
     # API - queues
     # ------------------------------------------------------
-    def add_queue(self, queue_name: str):
-        mongo_utils.add_item(SQDQueueInfoMongo, name=queue_name)
+    def add_queue(self, request: SQDQueueInfoMessage):
+        mongo_utils.add_item(SQDQueueInfoMongo, name=request.name)
+        self.update_queue(request)
 
     def update_queue(self, update: SQDQueueInfoMessage):
         if update.chat_type == QueueChatType.Input:
@@ -88,10 +73,15 @@ class SQDApp:
     def list_queues(self, **filters):
         return mongo_utils.list_items(SQDQueueInfoMongo, **filters)
 
-    # ------------------------------------------------------
-    # RUN
-    # ------------------------------------------------------
+    def has_queue(self, queue_name: str):
+        item = mongo_utils.get_item(SQDQueueInfoMongo, queue_name)
+        return item is not None
 
-    def run(self):
-        self.logger.info("Starting SQDApp")
-        asyncio.run(self.bot.run())
+    def get_queue(self, queue_name: str):
+        item = mongo_utils.get_item(SQDQueueInfoMongo, queue_name)
+        return GetQueueResponse(
+            name=item.name,
+            input_chat_id=item.input_chat_id,
+            output_chat_id=item.output_chat_id,
+            archive_chat_id=item.archive_chat_id
+        )

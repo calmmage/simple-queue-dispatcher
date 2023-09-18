@@ -37,3 +37,11 @@ class SQDQueueInfoMessage(BaseModel):
     name: str
     chat_id: str
     chat_type: QueueChatType
+
+
+class GetQueueResponse(BaseModel):
+    name: str
+    input_chat_id: Optional[str] = None
+    output_chat_id: Optional[str] = None
+    archive_chat_id: Optional[str] = None
+    queue_items: Optional[list[SQDQueueItemMessage]] = None
